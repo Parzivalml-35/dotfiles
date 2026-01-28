@@ -30,6 +30,7 @@ alias ls='eza --icons --group-directories-first'
 alias ll='eza -lh --icons --group-directories-first'
 alias la='eza -a --icons --group-directories-first'
 alias tree='eza --tree --icons'
+alias dotsync='cd ~/dotfiles && git add . && git commit -m "🔄 Sincronización rápida" && git push && cd -'
 
 # Colores de plugins
 ZSH_HIGHLIGHT_STYLES[command]='fg=#89b4fa,bold'
