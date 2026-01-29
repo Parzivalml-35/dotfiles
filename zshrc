@@ -1,42 +1,24 @@
-# --- ENTORNO Y TECLADO ---
-export TERM=xterm-256color
-# Arreglar tecla Supr (Delete) en Arch
-bindkey "^[[3~" delete-char
+# --- 3. CARGAR PLUGINS (Compatibilidad Arch/Ubuntu/Local) ---
 
-# --- ZSH COMPLETION ---
-fpath=(/usr/share/zsh/site-functions $fpath)
-autoload -Uz compinit && compinit
+# Función para cargar plugins desde rutas comunes
+load_plugin() {
+    local paths=("$1" "$2")
+    for p in $paths; do
+        if [ -f "$p" ]; then
+            source "$p"
+            return 0
+        fi
+    done
+}
 
-# --- 1. INICIO VISUAL ---
-# Solo ejecutar fastfetch si la sesión es interactiva
-[[ $- == *i* ]] && fastfetch
+# Cargar Syntax Highlighting
+load_plugin "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+            "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-# --- 2. CONFIGURACIÓN DEL HISTORIAL ---
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-setopt appendhistory
-setopt sharehistory
+# Cargar Autosuggestions
+load_plugin "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+            "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-# --- 3. CARGAR PLUGINS (Rutas exactas de Arch Linux) ---
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
-
-# --- 4. ALIAS Y ESTILOS ---
-alias cat='bat --paging=never'
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -lh --icons --group-directories-first'
-alias la='eza -a --icons --group-directories-first'
-alias tree='eza --tree --icons'
-alias dotsync='cd ~/dotfiles && git add . && git commit -m "🔄 Sincronización rápida" && git push && cd -'
-
-# Colores de plugins
-ZSH_HIGHLIGHT_STYLES[command]='fg=#89b4fa,bold'
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-# --- 5. INICIALIZACIONES (Al final para evitar conflictos) ---
-eval "$(zoxide init zsh)"
-eval "$(starship init zsh)"
+# Cargar FZF (Solo si el archivo existe)
+[ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
+[ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh
